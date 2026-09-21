@@ -8,6 +8,15 @@ public enum ApprovalMode
     Full
 }
 
+public enum CustomCommandHost
+{
+    Auto,
+    CommandPrompt,
+    WindowsPowerShell,
+    PowerShell7,
+    Wsl
+}
+
 public sealed class ShellDefinition
 {
     [JsonPropertyName("id")]
@@ -27,4 +36,7 @@ public sealed class ShellDefinition
 
     [JsonPropertyName("customCommand")]
     public string? CustomCommand { get; init; }
+
+    [JsonPropertyName("customCommandHost")]
+    public CustomCommandHost CustomCommandHost { get; init; } = CustomCommandHost.Auto;
 }
