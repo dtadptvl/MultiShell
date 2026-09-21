@@ -101,7 +101,7 @@
                                         Padding="4,1"
                                         CornerRadius="3"
                                         Background="#E8D9D9"
-                                        Visibility="{Binding IsFull, Converter={x:Static BooleanToVisibilityConverter.Instance}}">
+                                        Visibility="{Binding FullVisibility}">
                                     <TextBlock FontSize="10" FontWeight="SemiBold" Text="FULL"/>
                                 </Border>
                             </Grid>
