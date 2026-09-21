@@ -42,13 +42,16 @@ jobs:
       - name: Build and smoke test
         shell: pwsh
         run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
           dotnet restore .\MultiShell.sln
-          dotnet build .\MultiShell.sln -c Release --no-restore
+          dotnet build .\MultiShell.sln -c Release --no-restore -p:Version=$version
           .\.github\scripts\Run-Smoke.ps1 all
 
       - name: Publish portable folder
         shell: pwsh
-        run: .\build.ps1 -SkipTerminalBuild
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          .\build.ps1 -SkipTerminalBuild -Version $version
 
       - name: Package portable ZIP
         shell: pwsh
