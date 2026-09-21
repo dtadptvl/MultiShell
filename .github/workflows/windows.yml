@@ -80,7 +80,7 @@ jobs:
 
           $paste = $nativeDefault -or $forcePaste -or @($changed | Where-Object {
             $_ -in @(
-              "src/MultiShell/Terminal/ProjectSession.cs",
+              "src/MultiShell/Terminal/ShellSession.cs",
               "src/TerminalWpfPatched/NativeMethods.cs",
               "src/TerminalWpfPatched/TerminalContainer.cs",
               "src/TerminalWpfPatched/TerminalControl.xaml.cs"
@@ -89,7 +89,7 @@ jobs:
 
           $sessions = $nativeDefault -or $forceSessions -or @($changed | Where-Object {
             $_ -in @(
-              "src/MultiShell/Terminal/ProjectSession.cs",
+              "src/MultiShell/Terminal/ShellSession.cs",
               "src/MultiShell/MainWindow.xaml.cs",
               "src/TerminalWpfPatched/TerminalContainer.cs",
               "src/TerminalWpfPatched/TerminalControl.xaml.cs"
@@ -107,6 +107,10 @@ jobs:
 
       - name: Build managed solution
         run: dotnet build .\MultiShell.sln -c Release --no-restore
+
+      - name: CLI preset and launcher smoke
+        shell: pwsh
+        run: .\.github\scripts\Run-Smoke.ps1 presets
 
       - name: Clipboard and scroll smoke
         if: steps.changes.outputs.clipboard == 'true' || inputs.full_acceptance == true
