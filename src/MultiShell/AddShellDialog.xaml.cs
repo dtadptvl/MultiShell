@@ -113,15 +113,25 @@ public partial class AddShellDialog : Window
         }
 
         _preferences.PreferredExecutables.TryGetValue(preset.Id, out var preferred);
+        var preferredResolved = string.IsNullOrWhiteSpace(preferred)
+            ? null
+            : ExecutableResolver.ResolveOne(preferred);
         var detected = ExecutableResolver.FindAll(preset, preferred);
         ExecutableCombo.ItemsSource = detected;
 
         if (detected.Count > 0)
         {
             ExecutableCombo.SelectedIndex = 0;
-            AvailabilityText.Text = detected.Count == 1
-                ? "Detected automatically."
-                : $"Detected {detected.Count} executables. The selected path will be remembered.";
+            if (!string.IsNullOrWhiteSpace(preferred) && preferredResolved is null)
+            {
+                AvailabilityText.Text = "The remembered executable is unavailable; using the detected executable instead.";
+            }
+            else
+            {
+                AvailabilityText.Text = detected.Count == 1
+                    ? "Detected automatically."
+                    : $"Detected {detected.Count} executables. The selected path will be remembered.";
+            }
         }
         else
         {
