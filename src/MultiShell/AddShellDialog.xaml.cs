@@ -105,6 +105,9 @@ public partial class AddShellDialog : Window
         ApprovalCombo.SelectedItem = approvalChoices.Contains(_preferences.LastApprovalMode)
             ? _preferences.LastApprovalMode
             : ApprovalMode.Standard;
+        ApprovalSupportText.Text = preset.SupportsFullApproval
+            ? "Full Approval available for this preset."
+            : "Full Approval: Not supported.";
 
         if (preset.IsCustom)
         {
