@@ -13,8 +13,7 @@ public static class CommandLineBuilder
         if (extension.Equals(".cmd", StringComparison.OrdinalIgnoreCase) ||
             extension.Equals(".bat", StringComparison.OrdinalIgnoreCase))
         {
-            var inner = quotedExecutable + suffix;
-            return $"cmd.exe /d /s /c \"{inner.Replace("\"", "\"\"")}\"";
+            return $"cmd.exe /d /s /c \"\"{executablePath}\"{suffix}\"";
         }
 
         if (extension.Equals(".ps1", StringComparison.OrdinalIgnoreCase))
