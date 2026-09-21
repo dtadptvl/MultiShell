@@ -22,12 +22,14 @@ public partial class MainWindow : Window
     private readonly Dictionary<Guid, ShellSession> _sessions = [];
     private readonly ShellStore _shellStore = new();
     private readonly PreferencesStore _preferencesStore = new();
+    private readonly UpdateService _updateService = new();
     private readonly UserPreferences _preferences;
 
     private Forms.NotifyIcon? _trayIcon;
     private DrawingIcon? _trayDrawingIcon;
     private bool _isShuttingDown;
     private bool _suppressApprovalChange;
+    private bool _autoUpdateChecked;
     private Guid? _selectedShellId;
 
     public MainWindow()
@@ -106,7 +108,9 @@ public partial class MainWindow : Window
         _trayDrawingIcon = DrawingIcon.ExtractAssociatedIcon(Environment.ProcessPath!);
         var menu = new Forms.ContextMenuStrip();
         menu.Items.Add("Open", null, (_, _) => Dispatcher.Invoke(ShowFromTray));
-        menu.Items.Add("Quit", null, async (_, _) => await Dispatcher.InvokeAsync(QuitFromTrayAsync));
+        menu.Items.Add("Check for updates...", null, (_, _) => Dispatcher.Invoke(() => _ = CheckForUpdatesAsync(manual: true)));
+        menu.Items.Add(new Forms.ToolStripSeparator());
+        menu.Items.Add("Quit", null, (_, _) => Dispatcher.Invoke(() => _ = QuitFromTrayAsync()));
 
         _trayIcon = new Forms.NotifyIcon
         {
@@ -686,6 +690,96 @@ public partial class MainWindow : Window
             "MultiShell",
             MessageBoxButton.OK,
             MessageBoxImage.Error);
+    }
+
+    private async void OnContentRendered(object? sender, EventArgs e)
+    {
+        if (_autoUpdateChecked)
+        {
+            return;
+        }
+
+        _autoUpdateChecked = true;
+        await CheckForUpdatesAsync(manual: false);
+    }
+
+    private async Task CheckForUpdatesAsync(bool manual)
+    {
+        try
+        {
+            var update = await _updateService.CheckAsync();
+            if (update is null)
+            {
+                if (manual)
+                {
+                    MessageBox.Show(this,
+                        "MultiShell is up to date.",
+                        "MultiShell Update",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(update.AssetDownloadUrl))
+            {
+                if (manual)
+                {
+                    MessageBox.Show(this,
+                        $"MultiShell {update.Version} is available, but its portable update package is not attached to the release yet.",
+                        "MultiShell Update",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+
+                return;
+            }
+
+            var dialog = new UpdateDialog(update)
+            {
+                Owner = this
+            };
+
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            if (HasLiveSessions)
+            {
+                var confirm = MessageBox.Show(this,
+                    "Updating will stop all running shells and restart MultiShell. Continue?",
+                    "Update MultiShell",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning,
+                    MessageBoxResult.No);
+
+                if (confirm != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+
+                foreach (var session in _sessions.Values.Where(static x => x.IsLive).ToArray())
+                {
+                    await session.StopAsync();
+                }
+            }
+
+            await _updateService.StageAndLaunchUpdaterAsync(update);
+            BeginShutdown();
+        }
+        catch (Exception ex)
+        {
+            if (manual)
+            {
+                MessageBox.Show(this,
+                    $"Could not check for or apply the update.\n\n{ex.Message}",
+                    "MultiShell Update",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
     }
 
     private void OnWindowStateChanged(object? sender, EventArgs e)
