@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using MultiShell.Terminal;
 
 namespace MultiShell.Models;
@@ -45,6 +46,7 @@ public sealed class ShellItemViewModel : SidebarNodeViewModel
 
     public string Folder => Definition.Folder;
     public bool IsFull => Definition.ApprovalMode == ApprovalMode.Full;
+    public Visibility FullVisibility => IsFull ? Visibility.Visible : Visibility.Collapsed;
     public string StateGlyph => State == ShellSessionState.Running ? "●" : State == ShellSessionState.Starting ? "◐" : "○";
     public string StateText => State.ToString();
 }
