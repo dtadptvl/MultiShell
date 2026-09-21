@@ -171,7 +171,7 @@ public sealed class UpdateService
         startInfo.ArgumentList.Add("-StagingRoot");
         startInfo.ArgumentList.Add(stagingRoot);
 
-        Process.Start(startInfo)
+        _ = Process.Start(startInfo)
             ?? throw new InvalidOperationException("Could not launch the update helper.");
     }
 
