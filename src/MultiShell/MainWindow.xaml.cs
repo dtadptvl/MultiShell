@@ -14,6 +14,8 @@ using DrawingIcon = System.Drawing.Icon;
 using Forms = System.Windows.Forms;
 using WpfApplication = System.Windows.Application;
 using WpfButton = System.Windows.Controls.Button;
+using WpfContextMenu = System.Windows.Controls.ContextMenu;
+using WpfMenuItem = System.Windows.Controls.MenuItem;
 using WpfMessageBox = System.Windows.MessageBox;
 
 namespace MultiShell;
@@ -140,12 +142,12 @@ public partial class MainWindow : Window
 
     private async void OnOpenWithAnotherShellClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuItem menuItem)
+        if (sender is not WpfMenuItem menuItem)
         {
             return;
         }
 
-        var contextMenu = ItemsControl.ItemsControlFromItemContainer(menuItem) as ContextMenu;
+        var contextMenu = ItemsControl.ItemsControlFromItemContainer(menuItem) as WpfContextMenu;
         var item = (contextMenu?.PlacementTarget as FrameworkElement)?.DataContext as ShellItemViewModel;
         if (item is not null)
         {
