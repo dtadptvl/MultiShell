@@ -10,6 +10,7 @@ public sealed class UserPreferences
     public string LastPresetId { get; set; } = "kilo";
     public ApprovalMode LastApprovalMode { get; set; } = ApprovalMode.Standard;
     public string? LastCustomCommand { get; set; }
+    public CustomCommandHost LastCustomCommandHost { get; set; } = CustomCommandHost.Auto;
     public Dictionary<string, string> PreferredExecutables { get; set; } =
         new(StringComparer.OrdinalIgnoreCase);
     public long? TrayNoticeBootUnixSeconds { get; set; }
