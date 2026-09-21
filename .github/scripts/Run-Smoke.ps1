@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet("clipboard", "paste", "sessions", "all")]
+    [ValidateSet("clipboard", "paste", "sessions", "presets", "all")]
     [string]$Mode
 )
 
