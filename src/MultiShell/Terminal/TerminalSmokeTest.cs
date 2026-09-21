@@ -110,6 +110,24 @@ internal static class TerminalSmokeTest
             return Fail(75, $"Command shim is not delegated to cmd.exe: {shim}");
         }
 
+        var customCmd = CustomCommandBuilder.Build(
+            "echo one & echo two",
+            CustomCommandHost.CommandPrompt);
+        if (customCmd != "cmd.exe /d /s /c echo one & echo two")
+        {
+            return Fail(76, $"Custom cmd command was unexpectedly rewritten: {customCmd}");
+        }
+
+        var customPowerShell = CustomCommandBuilder.Build(
+            "Write-Output 'Tiếng Việt'",
+            CustomCommandHost.WindowsPowerShell);
+        if (!customPowerShell.StartsWith(
+                "powershell.exe -NoLogo -NoProfile -EncodedCommand ",
+                StringComparison.Ordinal))
+        {
+            return Fail(77, "Custom PowerShell command is not encoded safely.");
+        }
+
         return 0;
     }
 
