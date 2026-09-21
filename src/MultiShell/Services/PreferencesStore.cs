@@ -13,6 +13,8 @@ public sealed class UserPreferences
     public CustomCommandHost LastCustomCommandHost { get; set; } = CustomCommandHost.Auto;
     public Dictionary<string, string> PreferredExecutables { get; set; } =
         new(StringComparer.OrdinalIgnoreCase);
+    public HashSet<string> FullApprovalConfirmedPresetIds { get; set; } =
+        new(StringComparer.OrdinalIgnoreCase);
     public long? TrayNoticeBootUnixSeconds { get; set; }
 }
 
@@ -37,8 +39,11 @@ public sealed class PreferencesStore
             }
 
             using var stream = File.OpenRead(FilePath);
-            return JsonSerializer.Deserialize<UserPreferences>(stream, JsonOptions)
-                   ?? new UserPreferences();
+            var preferences = JsonSerializer.Deserialize<UserPreferences>(stream, JsonOptions)
+                              ?? new UserPreferences();
+            preferences.PreferredExecutables ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            preferences.FullApprovalConfirmedPresetIds ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            return preferences;
         }
         catch
         {
