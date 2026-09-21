@@ -9,7 +9,8 @@
         MinHeight="520"
         WindowStartupLocation="CenterScreen"
         Closing="OnWindowClosing"
-        StateChanged="OnWindowStateChanged">
+        StateChanged="OnWindowStateChanged"
+        ContentRendered="OnContentRendered">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="280"/>
