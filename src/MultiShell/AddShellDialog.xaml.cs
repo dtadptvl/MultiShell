@@ -5,6 +5,8 @@ using Microsoft.Win32;
 using MultiShell.Cli;
 using MultiShell.Models;
 using MultiShell.Services;
+using WpfMessageBox = System.Windows.MessageBox;
+using Win32OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
 namespace MultiShell;
 
@@ -173,7 +175,7 @@ public partial class AddShellDialog : Window
 
     private void OnBrowseExecutableClick(object sender, RoutedEventArgs e)
     {
-        var picker = new OpenFileDialog
+        var picker = new Win32OpenFileDialog
         {
             Title = "Choose CLI executable",
             Filter = "Executables and command shims (*.exe;*.com;*.cmd;*.bat;*.ps1)|*.exe;*.com;*.cmd;*.bat;*.ps1|All files (*.*)|*.*"
@@ -191,7 +193,7 @@ public partial class AddShellDialog : Window
         var folder = TryNormalizeFolder(FolderText.Text);
         if (folder is null || !Directory.Exists(folder))
         {
-            MessageBox.Show(this, "Choose an existing folder.", "Add Shell",
+            WpfMessageBox.Show(this, "Choose an existing folder.", "Add Shell",
                 MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
@@ -206,7 +208,7 @@ public partial class AddShellDialog : Window
                 string.Equals(TryNormalizeFolder(x.Folder), folder, StringComparison.OrdinalIgnoreCase) &&
                 string.Equals(x.PresetId, preset.Id, StringComparison.OrdinalIgnoreCase)))
         {
-            MessageBox.Show(this,
+            WpfMessageBox.Show(this,
                 $"{preset.Name} already exists for this folder. MultiShell allows one shell per CLI per folder.",
                 "Add Shell", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
@@ -227,7 +229,7 @@ public partial class AddShellDialog : Window
             customCommand = CustomCommandText.Text.Trim();
             if (string.IsNullOrWhiteSpace(customCommand))
             {
-                MessageBox.Show(this, "Enter a custom command.", "Add Shell",
+                WpfMessageBox.Show(this, "Enter a custom command.", "Add Shell",
                     MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
@@ -237,7 +239,7 @@ public partial class AddShellDialog : Window
             executable = ExecutableResolver.ResolveOne(ExecutableCombo.Text);
             if (executable is null)
             {
-                MessageBox.Show(this,
+                WpfMessageBox.Show(this,
                     $"{preset.Name} is not available. Choose a valid executable path.",
                     "Add Shell", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
