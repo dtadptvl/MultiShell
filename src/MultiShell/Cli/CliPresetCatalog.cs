@@ -4,7 +4,7 @@ public static class CliPresetCatalog
 {
     public static readonly IReadOnlyList<CliPreset> All =
     [
-        new("kilo", "Kilo Code", "AI Coding", ["kilo"], "", "--continue"),
+        new("kilo", "Kilo Code", "AI Coding", ["kilo"], "", "--continue", "--auto", "--auto --continue"),
         new("claude", "Claude Code", "AI Coding", ["claude"], "", "--continue",
             "--dangerously-skip-permissions", "--dangerously-skip-permissions --continue"),
         new("codex", "OpenAI Codex", "AI Coding", ["codex"], "", "resume --last",
