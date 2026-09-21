@@ -189,6 +189,13 @@ public sealed class UpdateService
             normalized = normalized[..prerelease];
         }
 
-        return Version.TryParse(normalized, out version!);
+        if (Version.TryParse(normalized, out var parsed) && parsed is not null)
+        {
+            version = parsed;
+            return true;
+        }
+
+        version = new Version(0, 0);
+        return false;
     }
 }
