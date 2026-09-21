@@ -48,8 +48,8 @@ public static class ExecutableResolver
         }
 
         var hasExtension = Path.HasExtension(expanded);
-        var extensions = hasExtension
-            ? [string.Empty]
+        IReadOnlyList<string> extensions = hasExtension
+            ? new[] { string.Empty }
             : GetPathExtensions();
 
         foreach (var directory in GetSearchDirectories())
