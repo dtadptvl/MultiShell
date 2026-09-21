@@ -20,23 +20,23 @@ public enum CustomCommandHost
 public sealed class ShellDefinition
 {
     [JsonPropertyName("id")]
-    public Guid Id { get; init; }
+    public Guid Id { get; set; }
 
     [JsonPropertyName("folder")]
-    public string Folder { get; init; } = string.Empty;
+    public string Folder { get; set; } = string.Empty;
 
     [JsonPropertyName("presetId")]
-    public string PresetId { get; init; } = string.Empty;
+    public string PresetId { get; set; } = string.Empty;
 
     [JsonPropertyName("approvalMode")]
-    public ApprovalMode ApprovalMode { get; init; } = ApprovalMode.Standard;
+    public ApprovalMode ApprovalMode { get; set; } = ApprovalMode.Standard;
 
     [JsonPropertyName("executablePath")]
-    public string? ExecutablePath { get; init; }
+    public string? ExecutablePath { get; set; }
 
     [JsonPropertyName("customCommand")]
-    public string? CustomCommand { get; init; }
+    public string? CustomCommand { get; set; }
 
     [JsonPropertyName("customCommandHost")]
-    public CustomCommandHost CustomCommandHost { get; init; } = CustomCommandHost.Auto;
+    public CustomCommandHost CustomCommandHost { get; set; } = CustomCommandHost.Auto;
 }
