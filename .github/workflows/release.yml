@@ -1,0 +1,63 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-2022
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore cached native terminal
+        id: terminal-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: artifacts/terminal/win-x64
+          key: terminal-win-x64-${{ hashFiles('eng/windows-terminal/Apply-Patch.ps1', 'eng/windows-terminal/Build-PatchedTerminal.ps1') }}
+
+      - name: Build patched Windows Terminal native control
+        if: steps.terminal-cache.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: .\eng\windows-terminal\Build-PatchedTerminal.ps1
+
+      - name: Save native terminal cache
+        if: steps.terminal-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: artifacts/terminal/win-x64
+          key: terminal-win-x64-${{ hashFiles('eng/windows-terminal/Apply-Patch.ps1', 'eng/windows-terminal/Build-PatchedTerminal.ps1') }}
+
+      - name: Build and smoke test
+        shell: pwsh
+        run: |
+          dotnet restore .\MultiShell.sln
+          dotnet build .\MultiShell.sln -c Release --no-restore
+          .\.github\scripts\Run-Smoke.ps1 all
+
+      - name: Publish portable folder
+        shell: pwsh
+        run: .\build.ps1 -SkipTerminalBuild
+
+      - name: Package portable ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive -Path .\dist\MultiShell-win-x64\* -DestinationPath .\MultiShell-win-x64.zip -Force
+
+      - name: Create GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" .\MultiShell-win-x64.zip --generate-notes --title "MultiShell ${{ github.ref_name }}"
