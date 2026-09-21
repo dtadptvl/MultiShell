@@ -11,6 +11,7 @@
     <Platforms>x64</Platforms>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <AssemblyName>MultiShell</AssemblyName>
+    <Version>0.1.0</Version>
     <RootNamespace>MultiShell</RootNamespace>
     <DefineConstants>$(DefineConstants);WPF</DefineConstants>
     <PublishTrimmed>false</PublishTrimmed>
