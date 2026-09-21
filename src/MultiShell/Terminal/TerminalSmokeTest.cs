@@ -5,6 +5,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using Microsoft.Terminal.Wpf;
+using MultiShell.Cli;
+using MultiShell.Models;
 
 namespace MultiShell.Terminal;
 
@@ -22,6 +24,7 @@ internal static class TerminalSmokeTest
                 "clipboard" => await VerifyNativeClipboardAndScrollAsync(),
                 "paste" => await VerifyNativeBracketedPasteAsync(),
                 "sessions" => await VerifyNativeSessionsAsync(),
+                "presets" => VerifyPresetMappings(),
                 "all" => await RunAllAsync(),
                 _ => Fail(21, $"Unknown smoke-test mode: {mode}")
             };
@@ -35,6 +38,12 @@ internal static class TerminalSmokeTest
 
     private static async Task<int> RunAllAsync()
     {
+        var presets = VerifyPresetMappings();
+        if (presets != 0)
+        {
+            return presets;
+        }
+
         var clipboardAndScroll = await VerifyNativeClipboardAndScrollAsync();
         if (clipboardAndScroll != 0)
         {
@@ -48,6 +57,60 @@ internal static class TerminalSmokeTest
         }
 
         return await VerifyNativeSessionsAsync();
+    }
+
+    private static int VerifyPresetMappings()
+    {
+        var expected = new[]
+        {
+            "kilo", "claude", "codex", "gemini", "opencode",
+            "copilot", "cursor", "amp", "aider",
+            "cmd", "powershell", "pwsh", "wsl", "custom"
+        };
+
+        var ids = CliPresetCatalog.All.Select(x => x.Id).ToArray();
+        if (ids.Distinct(StringComparer.OrdinalIgnoreCase).Count() != ids.Length)
+        {
+            return Fail(70, "CLI preset IDs are not unique.");
+        }
+
+        if (expected.Any(id => !ids.Contains(id, StringComparer.OrdinalIgnoreCase)))
+        {
+            return Fail(71, "One or more required CLI presets are missing.");
+        }
+
+        if (CliPresetCatalog.Get("kilo").GetArguments(true, ApprovalMode.Full) != "--auto --continue" ||
+            CliPresetCatalog.Get("claude").GetArguments(true, ApprovalMode.Full) != "--dangerously-skip-permissions --continue" ||
+            CliPresetCatalog.Get("codex").GetArguments(true, ApprovalMode.Full) != "--dangerously-bypass-approvals-and-sandbox resume --last" ||
+            CliPresetCatalog.Get("gemini").GetArguments(true, ApprovalMode.Full) != "--approval-mode=yolo --resume latest" ||
+            CliPresetCatalog.Get("opencode").GetArguments(true, ApprovalMode.Full) != "--auto --continue" ||
+            CliPresetCatalog.Get("copilot").GetArguments(true, ApprovalMode.Full) != "--allow-all --continue" ||
+            CliPresetCatalog.Get("cursor").GetArguments(true, ApprovalMode.Full) != "--force resume" ||
+            CliPresetCatalog.Get("aider").GetArguments(true, ApprovalMode.Full) != "--yes-always --restore-chat-history")
+        {
+            return Fail(72, "A CLI Start/Resume or Full Approval mapping changed unexpectedly.");
+        }
+
+        if (CliPresetCatalog.Get("amp").SupportsFullApproval ||
+            CliPresetCatalog.Get("cmd").SupportsFullApproval ||
+            CliPresetCatalog.Get("wsl").SupportsFullApproval)
+        {
+            return Fail(73, "A preset exposes Full Approval without a supported session-local mapping.");
+        }
+
+        var direct = CommandLineBuilder.Build(@"C:\Tools\demo.exe", "--flag");
+        if (direct != "\"C:\\Tools\\demo.exe\" --flag")
+        {
+            return Fail(74, $"Native executable launch unexpectedly uses an intermediary shell: {direct}");
+        }
+
+        var shim = CommandLineBuilder.Build(@"C:\Tools\demo.cmd", "--flag");
+        if (!shim.StartsWith("cmd.exe /d /s /c ", StringComparison.Ordinal))
+        {
+            return Fail(75, $"Command shim is not delegated to cmd.exe: {shim}");
+        }
+
+        return 0;
     }
 
     private static async Task<int> VerifyNativeClipboardAndScrollAsync()
