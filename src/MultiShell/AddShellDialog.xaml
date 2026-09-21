@@ -44,6 +44,10 @@
             <StackPanel Grid.Column="1" Margin="8,0,0,0">
                 <TextBlock FontWeight="SemiBold" Text="Approval"/>
                 <ComboBox x:Name="ApprovalCombo" Margin="0,6,0,0" MinHeight="30"/>
+                <TextBlock x:Name="ApprovalSupportText"
+                           Margin="0,5,0,0"
+                           FontSize="11"
+                           Foreground="{StaticResource MutedTextBrush}"/>
             </StackPanel>
         </Grid>
 
