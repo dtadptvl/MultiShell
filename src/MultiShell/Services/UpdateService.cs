@@ -134,11 +134,9 @@ public sealed class UpdateService
                 New-Item -ItemType Directory -Force -Path $Target | Out-Null
 
                 Get-ChildItem -LiteralPath $Source -Force | ForEach-Object {
-                    if ($_.Name -in @("shells.json", "preferences.json")) {
-                        return
+                    if ($_.Name -notin @("shells.json", "preferences.json")) {
+                        Copy-Item -LiteralPath $_.FullName -Destination $Target -Recurse -Force
                     }
-
-                    Copy-Item -LiteralPath $_.FullName -Destination $Target -Recurse -Force
                 }
 
                 Start-Process -FilePath $TargetExe
