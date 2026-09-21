@@ -12,6 +12,9 @@ using MultiShell.Services;
 using MultiShell.Terminal;
 using DrawingIcon = System.Drawing.Icon;
 using Forms = System.Windows.Forms;
+using WpfApplication = System.Windows.Application;
+using WpfButton = System.Windows.Controls.Button;
+using WpfMessageBox = System.Windows.MessageBox;
 
 namespace MultiShell;
 
@@ -95,7 +98,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this,
+            WpfMessageBox.Show(this,
                 $"Could not read shells.json.\n\n{ex.Message}",
                 "MultiShell",
                 MessageBoxButton.OK,
@@ -128,7 +131,7 @@ public partial class MainWindow : Window
 
     private async void OnAddShellToFolderClick(object sender, RoutedEventArgs e)
     {
-        if (sender is Button { Tag: string folder })
+        if (sender is WpfButton { Tag: string folder })
         {
             e.Handled = true;
             await ShowAddShellDialogAsync(folder);
@@ -195,7 +198,7 @@ public partial class MainWindow : Window
             return true;
         }
 
-        var result = MessageBox.Show(this,
+        var result = WpfMessageBox.Show(this,
             $"Full Approval lets {preset.Name} use its native session-local no-prompt mode. " +
             "It may edit files and run commands without asking first.\n\nEnable Full Approval for this CLI?",
             "Full Approval",
@@ -258,7 +261,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this,
+            WpfMessageBox.Show(this,
                 $"Could not open the folder.\n\n{ex.Message}",
                 "MultiShell",
                 MessageBoxButton.OK,
@@ -339,7 +342,7 @@ public partial class MainWindow : Window
 
         if (session?.IsLive == true)
         {
-            var result = MessageBox.Show(this,
+            var result = WpfMessageBox.Show(this,
                 $"{preset.Name} is running. Stop it and remove this shell from MultiShell?\n\n" +
                 "This does not delete the folder or the CLI's own history.",
                 "Remove shell",
@@ -650,7 +653,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this,
+            WpfMessageBox.Show(this,
                 $"Could not save shells.json.\n\n{ex.Message}",
                 "MultiShell",
                 MessageBoxButton.OK,
@@ -685,7 +688,7 @@ public partial class MainWindow : Window
 
     private void ShowSessionError(string message, Exception ex)
     {
-        MessageBox.Show(this,
+        WpfMessageBox.Show(this,
             $"{message}\n\n{ex.Message}",
             "MultiShell",
             MessageBoxButton.OK,
@@ -712,7 +715,7 @@ public partial class MainWindow : Window
             {
                 if (manual)
                 {
-                    MessageBox.Show(this,
+                    WpfMessageBox.Show(this,
                         "MultiShell is up to date.",
                         "MultiShell Update",
                         MessageBoxButton.OK,
@@ -726,7 +729,7 @@ public partial class MainWindow : Window
             {
                 if (manual)
                 {
-                    MessageBox.Show(this,
+                    WpfMessageBox.Show(this,
                         $"MultiShell {update.Version} is available, but its portable update package is not attached to the release yet.",
                         "MultiShell Update",
                         MessageBoxButton.OK,
@@ -748,7 +751,7 @@ public partial class MainWindow : Window
 
             if (HasLiveSessions)
             {
-                var confirm = MessageBox.Show(this,
+                var confirm = WpfMessageBox.Show(this,
                     "Updating will stop all running shells and restart MultiShell. Continue?",
                     "Update MultiShell",
                     MessageBoxButton.YesNo,
@@ -773,7 +776,7 @@ public partial class MainWindow : Window
         {
             if (manual)
             {
-                MessageBox.Show(this,
+                WpfMessageBox.Show(this,
                     $"Could not check for or apply the update.\n\n{ex.Message}",
                     "MultiShell Update",
                     MessageBoxButton.OK,
@@ -862,7 +865,7 @@ public partial class MainWindow : Window
     {
         if (HasLiveSessions)
         {
-            var result = MessageBox.Show(this,
+            var result = WpfMessageBox.Show(this,
                 "Stop all running shells and exit MultiShell?",
                 "Quit MultiShell",
                 MessageBoxButton.YesNo,
@@ -907,6 +910,6 @@ public partial class MainWindow : Window
 
         _trayDrawingIcon?.Dispose();
         _trayDrawingIcon = null;
-        Application.Current.Shutdown();
+        WpfApplication.Current.Shutdown();
     }
 }
