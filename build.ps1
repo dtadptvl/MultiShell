@@ -1,5 +1,6 @@
 param(
-    [switch]$SkipTerminalBuild
+    [switch]$SkipTerminalBuild,
+    [string]$Version
 )
 
 $ErrorActionPreference = "Stop"
@@ -16,7 +17,22 @@ if (Test-Path $out) {
     Remove-Item $out -Recurse -Force
 }
 
-dotnet publish $project -c Release -r win-x64 --self-contained true -p:PublishTrimmed=false -p:PublishReadyToRun=false -p:DebugType=None -p:DebugSymbols=false -o $out
+$publishArgs = @(
+    "publish", $project,
+    "-c", "Release",
+    "-r", "win-x64",
+    "--self-contained", "true",
+    "-p:PublishTrimmed=false",
+    "-p:PublishReadyToRun=false",
+    "-p:DebugType=None",
+    "-p:DebugSymbols=false",
+    "-o", $out
+)
+if (-not [string]::IsNullOrWhiteSpace($Version)) {
+    $publishArgs += "-p:Version=$Version"
+}
+
+dotnet @publishArgs
 if ($LASTEXITCODE -ne 0) {
     throw "dotnet publish failed with exit code $LASTEXITCODE"
 }
