@@ -79,7 +79,8 @@ internal static class TerminalSmokeTest
             return Fail(71, "One or more required CLI presets are missing.");
         }
 
-        if (CliPresetCatalog.Get("claude").GetArguments(true, ApprovalMode.Full) != "--dangerously-skip-permissions --continue" ||
+        if (CliPresetCatalog.Get("kilo").GetArguments(true, ApprovalMode.Full) != "--auto --continue" ||
+            CliPresetCatalog.Get("claude").GetArguments(true, ApprovalMode.Full) != "--dangerously-skip-permissions --continue" ||
             CliPresetCatalog.Get("codex").GetArguments(true, ApprovalMode.Full) != "--dangerously-bypass-approvals-and-sandbox resume --last" ||
             CliPresetCatalog.Get("gemini").GetArguments(true, ApprovalMode.Full) != "--approval-mode=yolo --resume latest" ||
             CliPresetCatalog.Get("opencode").GetArguments(true, ApprovalMode.Full) != "--auto --continue" ||
@@ -90,8 +91,7 @@ internal static class TerminalSmokeTest
             return Fail(72, "A CLI Start/Resume or Full Approval mapping changed unexpectedly.");
         }
 
-        if (CliPresetCatalog.Get("kilo").SupportsFullApproval ||
-            CliPresetCatalog.Get("amp").SupportsFullApproval ||
+        if (CliPresetCatalog.Get("amp").SupportsFullApproval ||
             CliPresetCatalog.Get("cmd").SupportsFullApproval ||
             CliPresetCatalog.Get("wsl").SupportsFullApproval)
         {
